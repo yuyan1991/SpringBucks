@@ -1,9 +1,9 @@
 # **Schema**
 
-## **Menu**
+## **Coffee**
 
 ```SQL
-create table menu (
+create table coffee (
     id bigint not null,
     create_time timestamp,
     name varchar(255),
