@@ -13,10 +13,10 @@ create table coffee (
 )
 ```
 
-## **Order**
+## **Orders**
 
 ```SQL
-create table order (
+create table orders (
     id bigint not null,
     create_time timestamp,
     customer varchar(255),
@@ -26,11 +26,11 @@ create table order (
 )
 ```
 
-## **Order_Coffee**
+## **Orders_Coffee**
 
 ```SQL
-create table order_coffee (
-   coffee_order_id bigint not null,
+create table orders_coffee (
+   coffee_orders_id bigint not null,
    items_id bigint not null
 )
 ```
