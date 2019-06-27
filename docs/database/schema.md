@@ -31,6 +31,6 @@ create table order (
 ```SQL
 create table order_coffee (
    coffee_order_id bigint not null,
-    items_id bigint not null
+   items_id bigint not null
 )
 ```
