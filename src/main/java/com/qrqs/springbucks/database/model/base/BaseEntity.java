@@ -1,4 +1,4 @@
-package com.qrqs.springbucks.datasource.model.base;
+package com.qrqs.springbucks.database.model.base;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

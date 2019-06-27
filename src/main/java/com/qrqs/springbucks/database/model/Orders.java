@@ -1,6 +1,6 @@
 package com.qrqs.springbucks.database.model;
 
-import com.qrqs.springbucks.datasource.model.base.BaseEntity;
+import com.qrqs.springbucks.database.model.base.BaseEntity;
 import lombok.*;
 
 import javax.persistence.*;
