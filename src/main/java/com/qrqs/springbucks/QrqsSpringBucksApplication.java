@@ -12,10 +12,12 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 @SuppressWarnings({"unused"})
 @SpringBootApplication
@@ -92,5 +94,22 @@ public class QrqsSpringBucksApplication implements ApplicationRunner {
 	}
 
 	private void findOrders() {
+		coffeeRepository.findAll(Sort.by(Sort.Direction.DESC, "id"))
+						.forEach((coffee) -> log.info("Coffee :: {}", coffee.toString()));
+
+		List<Orders> coffeeOrders = ordersRepository.findTop3ByOrderByUpdateTimeDescIdAsc();
+		printOrders(coffeeOrders);
+
+		coffeeOrders = ordersRepository.findByCustomerOrderByIdAsc("ziqi");
+		printOrders(coffeeOrders);
+
+		coffeeOrders = ordersRepository.findByItemsName("latte");
+		printOrders(coffeeOrders);
+	}
+
+	private void printOrders(List<Orders> coffeeOrders) {
+		log.debug("printOrders() start...");
+		coffeeOrders.forEach((orders) -> log.info("Order {} :: {}", orders.getId(), orders.toString()));
+		log.debug("printOrders() end...");
 	}
 }
