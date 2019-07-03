@@ -1,11 +1,7 @@
 package com.qrqs.springbucks.database.repositories;
 
 import com.qrqs.springbucks.database.model.Orders;
-import com.qrqs.springbucks.database.repositories.base.BaseRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
-
-public interface OrdersRepository extends BaseRepository<Orders, Long> {
-    List<Orders> findByCustomerOrderByIdAsc(String customer);
-    List<Orders> findByItemsName(String name);
+public interface OrdersRepository extends JpaRepository<Orders, Long> {
 }

@@ -16,8 +16,8 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 public class BaseEntity implements Serializable {
     @Id
-    @GeneratedValue
-    private long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(nullable = false, updatable = false)
     @CreationTimestamp

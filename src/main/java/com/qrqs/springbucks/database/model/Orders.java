@@ -1,6 +1,7 @@
 package com.qrqs.springbucks.database.model;
 
 import com.qrqs.springbucks.database.model.base.BaseEntity;
+import com.qrqs.springbucks.database.model.state.OrderState;
 import lombok.*;
 
 import javax.persistence.*;
@@ -25,8 +26,4 @@ public class Orders extends BaseEntity implements Serializable {
     @JoinTable(name = "orders_coffee")
     @OrderBy("id")
     private List<Coffee> items;
-
-    public enum OrderState {
-        INIT, PAID, BREWING, BREWED, TAKEN, CANCELLED
-    }
 }
