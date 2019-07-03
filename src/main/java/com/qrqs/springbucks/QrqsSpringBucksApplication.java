@@ -1,8 +1,5 @@
 package com.qrqs.springbucks;
 
-import com.qrqs.springbucks.database.mapper.CoffeeMapper;
-import com.qrqs.springbucks.database.model.Coffee;
-import com.qrqs.springbucks.database.model.CoffeeExample;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
@@ -30,8 +27,8 @@ import java.util.List;
 @Slf4j
 @MapperScan("com.qrqs.springbucks.database.mapper")
 public class QrqsSpringBucksApplication implements ApplicationRunner {
-	@Autowired
-	private CoffeeMapper coffeeMapper;
+//	@Autowired
+//	private CoffeeMapper coffeeMapper;
 
 	public static void main(String[] args) {
 		SpringApplication.run(QrqsSpringBucksApplication.class, args);
@@ -39,8 +36,8 @@ public class QrqsSpringBucksApplication implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) throws IOException, XMLParserException, InvalidConfigurationException, SQLException, InterruptedException {
-//		generateArtifacts();
-		playArtifacts();
+		generateArtifacts();
+//		playArtifacts();
 	}
 
 	private void generateArtifacts() throws IOException, XMLParserException, InvalidConfigurationException, SQLException, InterruptedException {
@@ -53,30 +50,30 @@ public class QrqsSpringBucksApplication implements ApplicationRunner {
 		myBatisGenerator.generate(null);
 	}
 
-	private void playArtifacts() {
-		Coffee espresso = new Coffee()
-								.withName("espresso")
-								.withPrice(Money.of(CurrencyUnit.of("CNY"), 20))
-								.withCreateTime(new Date())
-								.withUpdateTime(new Date());
-		coffeeMapper.insert(espresso);
-		log.info("Coffee espresso :: {}", espresso.toString());
-
-		Coffee latte = new Coffee()
-								.withName("latte")
-								.withPrice(Money.of(CurrencyUnit.of("CNY"), 30))
-								.withCreateTime(new Date())
-								.withUpdateTime(new Date());
-		coffeeMapper.insert(latte);
-		log.info("Coffee latte :: {}", latte.toString());
-
-		Coffee coffee = coffeeMapper.selectByPrimaryKey(1L);
-		log.info("Coffee :: {}", coffee);
-
-		CoffeeExample example = new CoffeeExample();
-		example.createCriteria().andNameEqualTo("latte");
-		List<Coffee> coffeeList = coffeeMapper.selectByExample(example);
-
-		coffeeList.forEach(res -> log.info("Coffee :: {}", res));
-	}
+//	private void playArtifacts() {
+//		Coffee espresso = new Coffee()
+//								.withName("espresso")
+//								.withPrice(Money.of(CurrencyUnit.of("CNY"), 20))
+//								.withCreateTime(new Date())
+//								.withUpdateTime(new Date());
+//		coffeeMapper.insert(espresso);
+//		log.info("Coffee espresso :: {}", espresso.toString());
+//
+//		Coffee latte = new Coffee()
+//								.withName("latte")
+//								.withPrice(Money.of(CurrencyUnit.of("CNY"), 30))
+//								.withCreateTime(new Date())
+//								.withUpdateTime(new Date());
+//		coffeeMapper.insert(latte);
+//		log.info("Coffee latte :: {}", latte.toString());
+//
+//		Coffee coffee = coffeeMapper.selectByPrimaryKey(1L);
+//		log.info("Coffee :: {}", coffee);
+//
+//		CoffeeExample example = new CoffeeExample();
+//		example.createCriteria().andNameEqualTo("latte");
+//		List<Coffee> coffeeList = coffeeMapper.selectByExample(example);
+//
+//		coffeeList.forEach(res -> log.info("Coffee :: {}", res));
+//	}
 }
