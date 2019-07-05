@@ -20,7 +20,7 @@ public class Coffee {
     private String name;
 
     private Money price;
-
+    
     private Date createTime;
 
     private Date updateTime;

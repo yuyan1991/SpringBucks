@@ -1,8 +1,8 @@
 package com.qrqs.springbucks;
 
-import com.mongodb.client.result.UpdateResult;
 import com.qrqs.springbucks.database.converter.MoneyReadConverter;
 import com.qrqs.springbucks.database.model.Coffee;
+import com.qrqs.springbucks.database.repository.CoffeeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
@@ -12,11 +12,8 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 
 import java.util.*;
 
@@ -25,7 +22,7 @@ import java.util.*;
 @Slf4j
 public class QrqsSpringBucksApplication implements ApplicationRunner {
 	@Autowired
-	private MongoTemplate mongoTemplate;
+	private CoffeeRepository coffeeRepository;
 
 	public static void main(String[] args) {
 		SpringApplication.run(QrqsSpringBucksApplication.class, args);
@@ -45,26 +42,33 @@ public class QrqsSpringBucksApplication implements ApplicationRunner {
 								.updateTime(new Date())
 								.build();
 
-		Coffee saved = mongoTemplate.save(espresso);
-		log.info("Coffee :: {}", saved);
+		Coffee latte = Coffee.builder()
+								.name("latte")
+								.price(Money.of(CurrencyUnit.of("CNY"), 30))
+								.createTime(new Date())
+								.updateTime(new Date())
+								.build();
 
-		log.info("All Coffee :: ");
-		List<Coffee> coffeeList = mongoTemplate.find(Query.query(Criteria.where("name").is("espresso")), Coffee.class);
+		coffeeRepository.insert(Arrays.asList(espresso, latte));
+
+		List<Coffee> coffeeList = coffeeRepository.findAll(Sort.by("name"));
 		Optional.ofNullable(coffeeList).ifPresent(
 				coffees -> coffees.forEach(
-									coffee -> log.info("\tCoffee :: {}", coffee)
+										(coffee) -> log.info("Coffee :: {}", coffee)
 				));
 
+		Thread.sleep(1000);
+		latte.setPrice(Money.of(CurrencyUnit.of("CNY"), 35));
+		latte.setUpdateTime(new Date());
+		log.info("Updated latte :: {}", latte);
 
-		Thread.sleep(1000); // 为了看更新时间
-		UpdateResult updateResult = mongoTemplate.updateFirst(
-				Query.query(Criteria.where("name").is("espresso")),
-				new Update().set("price", Money.of(CurrencyUnit.of("CNY"), 30)).currentDate("updateTime"),
-				Coffee.class);
-		log.info("Update Result :: {}", updateResult.getModifiedCount());
+		coffeeRepository.save(latte);
 
-		Coffee newUpdatedCoffee = mongoTemplate.findById(saved.getId(), Coffee.class);
-		log.info("New Updated Coffee :: {}", newUpdatedCoffee);
-		Optional.ofNullable(newUpdatedCoffee).ifPresent((updatedCoffee) -> mongoTemplate.remove(updatedCoffee));
+		coffeeList = coffeeRepository.findByName("latte");
+		Optional.ofNullable(coffeeList).ifPresent(
+				coffees -> coffees.forEach(
+						coffee -> log.info("Coffee :: {}", coffee)
+				));
+		coffeeRepository.deleteAll();
 	}
 }
