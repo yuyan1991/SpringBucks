@@ -27,6 +27,14 @@ public class CoffeeService {
     public void reloadCoffee() {
     }
 
+    @CacheEvict
+    public void reloadCoffeeFindAll() {
+    }
+
+    @CacheEvict(key = "#name")
+    public void reloadCoffeeFindByName(String name) {
+    }
+
     @Cacheable
     public List<Coffee> findAll() {
         List<Coffee> coffeeList = coffeeRepository.findAll();
