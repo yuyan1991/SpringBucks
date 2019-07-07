@@ -35,7 +35,8 @@ public class QrqsSpringBucksApplication implements ApplicationRunner {
 		coffeeService.findAll();
 		coffeeService.findByName("latte");
 
-		coffeeService.reloadCoffee();
+		Thread.sleep(5000);
+
 		log.info("After clearing cache :: ");
 		coffeeService.findAll();
 		coffeeService.findByName("latte");
