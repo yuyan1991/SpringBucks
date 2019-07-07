@@ -23,16 +23,16 @@ public class CoffeeService {
     @Autowired
     private CoffeeRepository coffeeRepository;
 
+    @CacheEvict(allEntries = true)
+    public void reloadCoffee() {
+    }
+
     @Cacheable
     public List<Coffee> findAll() {
         List<Coffee> coffeeList = coffeeRepository.findAll();
         log.info("All Coffee is {}", coffeeList);
 
         return coffeeList;
-    }
-
-    @CacheEvict
-    public void reloadCoffee() {
     }
 
     public Optional<Coffee> findOneCoffee(String name) {
@@ -44,6 +44,7 @@ public class CoffeeService {
         return coffee;
     }
 
+    @Cacheable
     public Optional<Coffee> findByName(String name) {
         Optional<Coffee> coffee = coffeeRepository.findByName(name);
 

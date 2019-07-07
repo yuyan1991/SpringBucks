@@ -1,7 +1,5 @@
 package com.qrqs.springbucks;
 
-import com.qrqs.springbucks.database.model.Coffee;
-import com.qrqs.springbucks.database.model.Orders;
 import com.qrqs.springbucks.service.CoffeeService;
 import com.qrqs.springbucks.service.OrdersService;
 import lombok.extern.slf4j.Slf4j;
@@ -11,12 +9,6 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
-
-import java.util.List;
-import java.util.Optional;
-
-import static com.qrqs.springbucks.database.model.state.OrderState.INIT;
-import static com.qrqs.springbucks.database.model.state.OrderState.PAID;
 
 @SuppressWarnings({"unused"})
 @SpringBootApplication
@@ -35,14 +27,17 @@ public class QrqsSpringBucksApplication implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
-		List<Coffee> coffeeList = coffeeService.findAll();
+		coffeeService.findAll();
+		coffeeService.findByName("latte");
 
 		log.info("Reading Cache ::");
 		coffeeService.findAll();
 		coffeeService.findAll();
+		coffeeService.findByName("latte");
 
 		coffeeService.reloadCoffee();
 		log.info("After clearing cache :: ");
 		coffeeService.findAll();
+		coffeeService.findByName("latte");
 	}
 }
