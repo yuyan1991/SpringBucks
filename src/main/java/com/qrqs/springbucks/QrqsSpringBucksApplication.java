@@ -10,6 +10,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +21,7 @@ import static com.qrqs.springbucks.database.model.state.OrderState.PAID;
 @SuppressWarnings({"unused"})
 @SpringBootApplication
 @Slf4j
+@EnableCaching(proxyTargetClass = true)
 public class QrqsSpringBucksApplication implements ApplicationRunner {
 	@Autowired
 	private CoffeeService coffeeService;
@@ -35,19 +37,12 @@ public class QrqsSpringBucksApplication implements ApplicationRunner {
 	public void run(ApplicationArguments args) throws Exception {
 		List<Coffee> coffeeList = coffeeService.findAll();
 
-		Optional<Coffee> latte = coffeeService.findByName("latte");
-		log.info("Coffee :: {}", latte);
+		log.info("Reading Cache ::");
+		coffeeService.findAll();
+		coffeeService.findAll();
 
-		latte = coffeeService.findByName("Latte");
-		log.info("Coffee :: {}", latte);
-
-		latte = coffeeService.findOneCoffee("Latte");
-		log.info("Coffee :: {}", latte);
-
-		if (latte.isPresent()) {
-			Orders order = ordersService.createOrder("ziqi", latte.get());
-			ordersService.updateState(order, PAID);
-			ordersService.updateState(order, INIT);
-		}
+		coffeeService.reloadCoffee();
+		log.info("After clearing cache :: ");
+		coffeeService.findAll();
 	}
 }
