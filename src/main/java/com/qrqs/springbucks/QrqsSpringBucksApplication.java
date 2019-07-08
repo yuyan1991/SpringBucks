@@ -10,6 +10,9 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +30,13 @@ public class QrqsSpringBucksApplication implements ApplicationRunner {
 	@Autowired
 	private OrdersService ordersService;
 
+	@Bean
+	public RedisTemplate<String, Coffee> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+		RedisTemplate<String, Coffee> template = new RedisTemplate<>();
+		template.setConnectionFactory(redisConnectionFactory);
+		return template;
+	}
+
 	public static void main(String[] args) {
 		SpringApplication.run(QrqsSpringBucksApplication.class, args);
 	}
@@ -35,14 +45,15 @@ public class QrqsSpringBucksApplication implements ApplicationRunner {
 	public void run(ApplicationArguments args) throws Exception {
 		List<Coffee> coffeeList = coffeeService.findAll();
 
-		Optional<Coffee> latte = coffeeService.findByName("latte");
-		log.info("Coffee :: {}", latte);
+		coffeeService.findByName("latte");
 
-		latte = coffeeService.findByName("Latte");
-		log.info("Coffee :: {}", latte);
+		coffeeService.findByName("Latte");
 
-		latte = coffeeService.findOneCoffee("Latte");
-		log.info("Coffee :: {}", latte);
+		coffeeService.findOneCoffee("Latte");
+		coffeeService.findOneCoffee("latte");
+
+		Optional<Coffee> latte = coffeeService.findOneCoffee("Latte");
+		coffeeService.findOneCoffee("espresso");
 
 		if (latte.isPresent()) {
 			Orders order = ordersService.createOrder("ziqi", latte.get());

@@ -6,16 +6,24 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import static org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers.exact;
 
 @Service
 @Slf4j
 public class CoffeeService {
+    private static final String CACHE = "springbucks-coffee";
+
+    @Autowired
+    private RedisTemplate<String, Coffee> redisTemplate;
+
     @Autowired
     private CoffeeRepository coffeeRepository;
 
@@ -27,10 +35,23 @@ public class CoffeeService {
     }
 
     public Optional<Coffee> findOneCoffee(String name) {
-        ExampleMatcher matcher = ExampleMatcher.matching().withMatcher("name", exact().ignoreCase());
-        Optional<Coffee> coffee = coffeeRepository.findOne(Example.of(Coffee.builder().name(name).build(), matcher));
+        Optional<Coffee> coffee = null;
 
-        printCoffeeInfo(coffee);
+        HashOperations<String, String, Coffee> coffeeCache = redisTemplate.opsForHash();
+        if (redisTemplate.hasKey(CACHE) && coffeeCache.hasKey(CACHE, name)) {
+            coffee = Optional.of(coffeeCache.get(CACHE, name));
+            log.info("Get Coffee {} from cache :: ", name, coffee);
+        } else {
+            ExampleMatcher matcher = ExampleMatcher.matching().withMatcher("name", exact().ignoreCase());
+            coffee = coffeeRepository.findOne(Example.of(Coffee.builder().name(name).build(), matcher));
+
+            printCoffeeInfo(coffee);
+
+            if (coffee.isPresent()) {
+                coffeeCache.put(CACHE, name, coffee.get());
+                redisTemplate.expire(CACHE, 1, TimeUnit.MINUTES);
+            }
+        }
 
         return coffee;
     }
