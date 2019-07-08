@@ -1,9 +1,9 @@
 package com.qrqs.springbucks;
 
+import com.qrqs.springbucks.database.converter.BytesToMoneyConverter;
+import com.qrqs.springbucks.database.converter.MoneyToBytesConverter;
 import com.qrqs.springbucks.database.model.Coffee;
-import com.qrqs.springbucks.database.model.Orders;
 import com.qrqs.springbucks.service.CoffeeService;
-import com.qrqs.springbucks.service.OrdersService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -11,14 +11,10 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.convert.RedisCustomConversions;
 
-import java.util.List;
+import java.util.Arrays;
 import java.util.Optional;
-
-import static com.qrqs.springbucks.database.model.state.OrderState.INIT;
-import static com.qrqs.springbucks.database.model.state.OrderState.PAID;
 
 @SuppressWarnings({"unused"})
 @SpringBootApplication
@@ -27,14 +23,9 @@ public class QrqsSpringBucksApplication implements ApplicationRunner {
 	@Autowired
 	private CoffeeService coffeeService;
 
-	@Autowired
-	private OrdersService ordersService;
-
 	@Bean
-	public RedisTemplate<String, Coffee> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
-		RedisTemplate<String, Coffee> template = new RedisTemplate<>();
-		template.setConnectionFactory(redisConnectionFactory);
-		return template;
+	public RedisCustomConversions redisCustomConversions() {
+		return new RedisCustomConversions(Arrays.asList(new BytesToMoneyConverter(), new MoneyToBytesConverter()));
 	}
 
 	public static void main(String[] args) {
@@ -43,22 +34,12 @@ public class QrqsSpringBucksApplication implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
-		List<Coffee> coffeeList = coffeeService.findAll();
+		Optional<Coffee> coffee = coffeeService.findCoffeeByCache("mocha");
+		log.info("Coffee :: {}", coffee);
 
-		coffeeService.findByName("latte");
+		coffeeService.findCoffeeByCache("mocha");
+		coffee = coffeeService.findCoffeeByCache("mocha");
 
-		coffeeService.findByName("Latte");
-
-		coffeeService.findOneCoffee("Latte");
-		coffeeService.findOneCoffee("latte");
-
-		Optional<Coffee> latte = coffeeService.findOneCoffee("Latte");
-		coffeeService.findOneCoffee("espresso");
-
-		if (latte.isPresent()) {
-			Orders order = ordersService.createOrder("ziqi", latte.get());
-			ordersService.updateState(order, PAID);
-			ordersService.updateState(order, INIT);
-		}
+		log.info("Coffee from Redis :: {}", coffee);
 	}
 }

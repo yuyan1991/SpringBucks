@@ -1,7 +1,9 @@
 package com.qrqs.springbucks.service;
 
 import com.qrqs.springbucks.database.model.Coffee;
+import com.qrqs.springbucks.database.model.cache.CoffeeCache;
 import com.qrqs.springbucks.database.repositories.CoffeeRepository;
+import com.qrqs.springbucks.database.repositories.cache.CoffeeCacheRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -19,10 +21,8 @@ import static org.springframework.data.domain.ExampleMatcher.GenericPropertyMatc
 @Service
 @Slf4j
 public class CoffeeService {
-    private static final String CACHE = "springbucks-coffee";
-
     @Autowired
-    private RedisTemplate<String, Coffee> redisTemplate;
+    private CoffeeCacheRepository coffeeCacheRepository;
 
     @Autowired
     private CoffeeRepository coffeeRepository;
@@ -35,23 +35,10 @@ public class CoffeeService {
     }
 
     public Optional<Coffee> findOneCoffee(String name) {
-        Optional<Coffee> coffee = null;
+        ExampleMatcher matcher = ExampleMatcher.matching().withMatcher("name", exact().ignoreCase());
+        Optional<Coffee> coffee = coffeeRepository.findOne(Example.of(Coffee.builder().name(name).build(), matcher));
 
-        HashOperations<String, String, Coffee> coffeeCache = redisTemplate.opsForHash();
-        if (redisTemplate.hasKey(CACHE) && coffeeCache.hasKey(CACHE, name)) {
-            coffee = Optional.of(coffeeCache.get(CACHE, name));
-            log.info("Get Coffee {} from cache :: ", name, coffee);
-        } else {
-            ExampleMatcher matcher = ExampleMatcher.matching().withMatcher("name", exact().ignoreCase());
-            coffee = coffeeRepository.findOne(Example.of(Coffee.builder().name(name).build(), matcher));
-
-            printCoffeeInfo(coffee);
-
-            if (coffee.isPresent()) {
-                coffeeCache.put(CACHE, name, coffee.get());
-                redisTemplate.expire(CACHE, 1, TimeUnit.MINUTES);
-            }
-        }
+        printCoffeeInfo(coffee);
 
         return coffee;
     }
@@ -62,6 +49,23 @@ public class CoffeeService {
         printCoffeeInfo(coffee);
 
         return coffee;
+    }
+
+    public Optional<Coffee> findCoffeeByCache(String name) {
+        Optional<CoffeeCache> cachedCoffee = coffeeCacheRepository.findByName(name);
+        Coffee result = null;
+        if (cachedCoffee.isPresent()) {
+            result = Coffee.builder().name(cachedCoffee.get().getName()).price(cachedCoffee.get().getPrice()).build();
+        } else {
+            Optional<Coffee> coffee = coffeeRepository.findByName(name);
+            if (coffee.isPresent()) {
+                result = coffee.get();
+                CoffeeCache coffeeCache = CoffeeCache.builder().name(result.getName()).price(result.getPrice()).build();
+                coffeeCacheRepository.save(coffeeCache);
+            }
+        }
+
+        return Optional.of(result);
     }
 
     private void printCoffeeInfo(Optional<Coffee> coffee) {
