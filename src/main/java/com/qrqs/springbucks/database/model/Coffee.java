@@ -1,6 +1,9 @@
 package com.qrqs.springbucks.database.model;
 
 import lombok.*;
+import org.joda.money.Money;
+
+import java.util.Date;
 
 @Data
 @Builder
@@ -12,5 +15,9 @@ public class Coffee {
 
     private String name;
 
-    private Long price;
+    private Money price;
+
+    private Date createTime;
+
+    private Date updateTime;
 }
