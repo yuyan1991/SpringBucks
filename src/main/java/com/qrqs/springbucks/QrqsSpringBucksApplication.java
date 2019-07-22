@@ -31,7 +31,7 @@ import static org.springframework.data.mongodb.core.query.Query.query;
 public class QrqsSpringBucksApplication implements ApplicationRunner {
 	@Autowired
 	private ReactiveMongoTemplate mongoTemplate;
-	private CountDownLatch cdl = new CountDownLatch(1);
+	private CountDownLatch cdl = new CountDownLatch(2);
 
 	public static void main(String[] args) {
 		SpringApplication.run(QrqsSpringBucksApplication.class, args);
@@ -52,7 +52,7 @@ public class QrqsSpringBucksApplication implements ApplicationRunner {
 
 		log.info("after starting");
 
-//		decreaseHighPrice();
+		decreaseHighPrice();
 
 		cdl.await();
 	}
@@ -74,6 +74,7 @@ public class QrqsSpringBucksApplication implements ApplicationRunner {
 		mongoTemplate.updateMulti(query(where("price").gte(3000L)),
 				new Update().inc("price", -500L)
 						.currentDate("updateTime"), Coffee.class)
+				.publishOn(Schedulers.elastic())
 				.doFinally(s -> {
 					cdl.countDown();
 					log.info("Finally 2, {}", s);

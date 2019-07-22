@@ -11,7 +11,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Coffee {
-    private Long id;
+    private String id;
 
     private String name;
 
