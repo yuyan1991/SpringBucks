@@ -13,6 +13,7 @@ import java.util.Arrays;
 
 import static com.qrqs.springbucks.database.model.state.OrderState.INIT;
 
+@SuppressWarnings({"unused"})
 @Service
 @Transactional
 @Slf4j
