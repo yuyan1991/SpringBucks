@@ -1,27 +1,28 @@
 package com.qrqs.springbucks.database.model;
 
-import com.qrqs.springbucks.database.model.base.BaseEntity;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.qrqs.springbucks.database.serializer.MoneyDeserializer;
+import com.qrqs.springbucks.database.serializer.MoneySerializer;
 import lombok.*;
-import org.hibernate.annotations.Type;
 import org.joda.money.Money;
+import org.springframework.data.annotation.Id;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
 import java.io.Serializable;
+import java.util.Date;
 
-@Entity
-@Data
 @Builder
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
+@ToString
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Coffee extends BaseEntity implements Serializable {
-    @Column(nullable = false)
+public class Coffee implements Serializable {
+    @Id
+    private Long id;
     private String name;
-
-    @Column(nullable = false)
-    @Type(type = "org.jadira.usertype.moneyandcurrency.joda.PersistentMoneyMinorAmount",
-            parameters = {@org.hibernate.annotations.Parameter(name = "currencyCode", value = "CNY")})
+    @JsonSerialize(using = MoneySerializer.class)
+    @JsonDeserialize(using = MoneyDeserializer.class)
     private Money price;
+    private Date createTime;
+    private Date updateTime;
 }
