@@ -8,5 +8,6 @@ import java.util.Optional;
 
 public interface CoffeeRepository extends JpaRepository<Coffee, Long> {
     Optional<Coffee> findByName(String name);
+    Coffee getCoffeeByName(String name);
     List<Coffee> findByNameInOrderById(List<String> coffeeNameList);
 }

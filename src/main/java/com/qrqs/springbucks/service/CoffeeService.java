@@ -57,6 +57,14 @@ public class CoffeeService {
         return coffee;
     }
 
+    public Coffee getCoffee(long id) {
+        return coffeeRepository.getOne(id);
+    }
+
+    public Coffee getCoffee(String name) {
+        return coffeeRepository.getCoffeeByName(name);
+    }
+
     private void printCoffeeInfo(Optional<Coffee> coffee) {
         if (coffee.isPresent()) {
             log.info("Coffee found :: {}", coffee.get());
