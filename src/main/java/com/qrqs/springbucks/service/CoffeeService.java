@@ -3,6 +3,8 @@ package com.qrqs.springbucks.service;
 import com.qrqs.springbucks.database.model.Coffee;
 import com.qrqs.springbucks.database.repositories.CoffeeRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.money.CurrencyUnit;
+import org.joda.money.Money;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
@@ -23,6 +25,10 @@ import static org.springframework.data.domain.ExampleMatcher.GenericPropertyMatc
 public class CoffeeService {
     @Autowired
     private CoffeeRepository coffeeRepository;
+
+    public Coffee saveCoffee(String name, Money price) {
+        return coffeeRepository.save(Coffee.builder().name(name).price(price).build());
+    }
 
     @Cacheable
     public List<Coffee> getAllCoffee() {
