@@ -21,6 +21,11 @@ public class OrdersController {
     @Autowired
     private CoffeeService coffeeService;
 
+    @GetMapping("/{id}")
+    public Orders getOrder(@PathVariable("id") Long id) {
+        return ordersService.get(id);
+    }
+
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public Orders create(@RequestBody NewOrderRequest request) {

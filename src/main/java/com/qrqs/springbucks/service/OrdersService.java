@@ -21,6 +21,10 @@ public class OrdersService {
     @Autowired
     private OrdersRepository ordersRepository;
 
+    public Orders get(Long id) {
+        return ordersRepository.getOne(id);
+    }
+
     @Transactional
     public Orders createOrder(String customer, Coffee... coffeeOrderList) {
         Orders order = Orders.builder()
