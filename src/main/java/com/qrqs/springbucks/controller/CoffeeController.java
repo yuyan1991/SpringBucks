@@ -3,6 +3,9 @@ package com.qrqs.springbucks.controller;
 import com.qrqs.springbucks.controller.request.NewCoffeeRequest;
 import com.qrqs.springbucks.database.model.Coffee;
 import com.qrqs.springbucks.service.CoffeeService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -27,6 +30,7 @@ import java.util.List;
 @Controller
 @RequestMapping("/coffee")
 @Slf4j
+@Api
 public class CoffeeController {
     @Autowired
     private CoffeeService coffeeService;
@@ -34,7 +38,10 @@ public class CoffeeController {
     @PostMapping(path = "/", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
-    public Coffee addCoffee(@Valid NewCoffeeRequest newCoffee, BindingResult result) {
+    @ApiOperation(value = "新增咖啡")
+    public Coffee addCoffee(@ApiParam(name = "新咖啡", value = "新品种咖啡", required = true)
+                                @Valid NewCoffeeRequest newCoffee,
+                            BindingResult result) {
         log.info("Enter into addCoffee() :: {}", newCoffee);
         if (result.hasErrors()) {
             log.warn("Binding Errors: {}", result);
@@ -54,7 +61,9 @@ public class CoffeeController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
-    public List<Coffee> batchAddCoffee(@RequestParam("file") MultipartFile file) {
+    @ApiOperation(value = "批量新增咖啡")
+    public List<Coffee> batchAddCoffee(@ApiParam(name="咖啡文件列表", value = "新增的咖啡列表清单文件", required = true)
+                                           @RequestParam("file") MultipartFile file) {
         List<Coffee> coffees = new ArrayList<Coffee>();
         if (!file.isEmpty()) {
             try (BufferedReader reader = new BufferedReader(
@@ -77,20 +86,24 @@ public class CoffeeController {
 
     @GetMapping(params = "!name")
     @ResponseBody
+    @ApiOperation(value = "查询所有咖啡")
     public List<Coffee> getAll() {
         return coffeeService.getAllCoffee();
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
-    public Coffee getById(@PathVariable Long id) {
+    @ApiOperation(value = "根据id查询咖啡")
+    public Coffee getById(@ApiParam(name = "id", value = "咖啡id编号", required = true) @PathVariable Long id) {
         Coffee coffee = coffeeService.getCoffee(id);
         return coffee;
     }
 
     @GetMapping(value = "/", params = "name")
     @ResponseBody
-    public Coffee getByName(@RequestParam String name) {
+    @ApiOperation("根据咖啡名查询咖啡")
+    public Coffee getByName(@ApiParam(name = "咖啡名", value = "要查询的咖啡名字", required = true)
+                                @RequestParam String name) {
         return coffeeService.getCoffee(name);
     }
 }
